@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            checkAuth();
+            window.location.reload();
         });
     }
 });

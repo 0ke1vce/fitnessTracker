@@ -3,7 +3,7 @@ const pool = require('../config/db');
 const getProfile = async (req, res) => {
     try {
         const userId = req.user.id;
-        const [users] = await pool.query('SELECT id, name, email, age, weight, height, goal_weight FROM Users WHERE id = ?', [userId]);
+        const [users] = await pool.query('SELECT id, name, email, age, weight, height, goal_weight, profile_image FROM Users WHERE id = ?', [userId]);
 
         if (users.length === 0) {
             return res.status(404).json({ message: 'User not found' });
@@ -19,15 +19,15 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { name, age, weight, height, goal_weight } = req.body;
+        const { name, age, weight, height, goal_weight, profile_image } = req.body;
 
         if (!name) {
             return res.status(400).json({ message: 'Name is required' });
         }
 
         const [result] = await pool.query(
-            'UPDATE Users SET name = ?, age = ?, weight = ?, height = ?, goal_weight = ? WHERE id = ?',
-            [name, age || null, weight || null, height || null, goal_weight || null, userId]
+            'UPDATE Users SET name = ?, age = ?, weight = ?, height = ?, goal_weight = ?, profile_image = ? WHERE id = ?',
+            [name, age || null, weight || null, height || null, goal_weight || null, profile_image || null, userId]
         );
 
         res.json({ message: 'Profile updated successfully' });

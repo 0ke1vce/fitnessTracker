@@ -18,21 +18,26 @@ const getWorkouts = async (req, res) => {
     }
 };
 
+const gamificationController = require('./gamificationController');
+
 const addWorkout = async (req, res) => {
     try {
+        const { exercise_id, date, sets, reps, weight_used, rpe, rest_time_seconds } = req.body;
         const userId = req.user.id;
-        const { exercise_id, date, sets, reps } = req.body;
 
         if (!exercise_id || !date || !sets || !reps) {
-            return res.status(400).json({ message: 'Please add all required fields' });
+            return res.status(400).json({ message: 'Please provide all required fields' });
         }
 
         const [result] = await pool.query(
-            'INSERT INTO Workouts (user_id, exercise_id, date, sets, reps) VALUES (?, ?, ?, ?, ?)',
-            [userId, exercise_id, date, sets, reps]
+            'INSERT INTO Workouts (user_id, exercise_id, date, sets, reps, weight_used, rpe, rest_time_seconds) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, exercise_id, date, sets, reps, weight_used || 0, rpe || null, rest_time_seconds || 0]
         );
 
-        res.status(201).json({ id: result.insertId, user_id: userId, exercise_id, date, sets, reps });
+        // Award 50 XP per workout log
+        await gamificationController.awardXP(userId, 50);
+
+        res.status(201).json({ message: 'Workout added successfully', workoutId: result.insertId });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error adding workout' });

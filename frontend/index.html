@@ -1,245 +1,477 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Fitness Planner & Tracker</title>
-    <meta name="description" content="A dynamic, sleek fitness planner and tracker to organize workouts and log progress.">
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome for icons -->
+    <title>FitTrack Pro — Your Ultimate Fitness OS</title>
+    <meta name="description" content="AI-powered fitness tracking, live workout mode, trainer marketplace, and gamification — all in one cinematic app.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- CSS files -->
     <link rel="stylesheet" href="./styles/main.css">
     <link rel="stylesheet" href="./styles/auth.css">
     <link rel="stylesheet" href="./styles/dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💪</text></svg>">
 </head>
-<body class="dark-theme">
-    <div id="loader" class="loader-overlay hidden">
-        <div class="spinner"></div>
+<body>
+
+<!-- Loader -->
+<div id="loader" class="loader-overlay hidden" style="display:none">
+    <div class="spinner"></div>
+    <div class="loader-text">LOADING FITTRACK PRO...</div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════════════════════════════════ AUTH VIEW ══ -->
+<section id="authView" class="view hidden">
+    <div class="auth-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Auth View -->
-    <section id="authView" class="view hidden">
-        <div class="auth-container glass-panel">
-            <div class="auth-header">
-                <h2><i class="fa-solid fa-dumbbell text-gradient"></i> FitTrack</h2>
-                <p>Your ultimate fitness companion.</p>
-            </div>
-            
-            <div class="auth-tabs">
-                <button id="loginTab" class="active">Login</button>
-                <button id="registerTab">Register</button>
-            </div>
-
-            <!-- Login Form -->
-            <form id="loginForm" class="auth-form">
-                <div class="input-group">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="email" id="loginEmail" placeholder="Email Address" required>
-                </div>
-                <div class="input-group">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="loginPassword" placeholder="Password" required>
-                </div>
-                <button type="submit" class="btn-primary">Sign In <i class="fa-solid fa-arrow-right"></i></button>
-            </form>
-
-            <!-- Register Form -->
-            <form id="registerForm" class="auth-form hidden">
-                <div class="input-group">
-                    <i class="fa-solid fa-user"></i>
-                    <input type="text" id="regName" placeholder="Full Name" required>
-                </div>
-                <div class="input-group">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="email" id="regEmail" placeholder="Email Address" required>
-                </div>
-                <div class="input-group">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="regPassword" placeholder="Password" required>
-                </div>
-                <div class="horizontal-inputs">
-                    <input type="number" id="regAge" placeholder="Age">
-                    <input type="number" step="0.1" id="regWeight" placeholder="Weight (kg)">
-                    <input type="number" step="0.1" id="regHeight" placeholder="Height (cm)">
-                </div>
-                <button type="submit" class="btn-primary">Create Account</button>
-            </form>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo"><i class="fa-solid fa-dumbbell"></i></div>
+            <h2>Fit<span>Track</span> Pro</h2>
+            <p>Your AI-powered fitness operating system</p>
         </div>
-        <div class="auth-bg-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
+
+        <div class="auth-tabs">
+            <button id="loginTab" class="active">Sign In</button>
+            <button id="registerTab">Create Account</button>
         </div>
-    </section>
 
-    <!-- Dashboard View -->
-    <section id="dashboardView" class="view hidden">
-        <nav class="sidebar glass-panel">
-            <div class="sidebar-brand">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fa-solid fa-dumbbell text-gradient"></i>
-                    <h2>FitTrack</h2>
-                </div>
-                <button id="mobileMenuBtn" class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></button>
+        <!-- Login -->
+        <form id="loginForm" class="auth-form">
+            <div class="input-group">
+                <input type="email" id="loginEmail" placeholder="Email address" required>
+                <i class="fa-solid fa-envelope"></i>
             </div>
-            <ul class="nav-links">
-                <li><a href="#" class="active" data-target="overview"><i class="fa-solid fa-house"></i> <span>Overview</span></a></li>
-                <li><a href="#" data-target="workouts"><i class="fa-solid fa-calendar-check"></i> <span>Workouts</span></a></li>
-                <li><a href="#" data-target="progress"><i class="fa-solid fa-chart-line"></i> <span>Progress</span></a></li>
-                <li><a href="#" data-target="profile"><i class="fa-solid fa-user-gear"></i> <span>Profile</span></a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                    <span id="userNameDisplay">User</span>
-                </div>
-                <button id="logoutBtn" class="btn-icon"><i class="fa-solid fa-sign-out-alt"></i></button>
+            <div class="input-group">
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <i class="fa-solid fa-lock"></i>
             </div>
-        </nav>
+            <button type="submit" class="btn-primary">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+            </button>
+        </form>
 
-        <main class="dashboard-content">
-            <header class="topbar glass-panel">
-                <h1 id="pageTitle">Dashboard</h1>
-                <div class="date-display" id="currentDate"></div>
-            </header>
+        <!-- Register -->
+        <form id="registerForm" class="auth-form hidden">
+            <div class="input-group">
+                <input type="text" id="regName" placeholder="Full name" required>
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="input-group">
+                <input type="email" id="regEmail" placeholder="Email address" required>
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div class="input-group">
+                <input type="password" id="regPassword" placeholder="Password" required>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div class="horizontal-inputs">
+                <input type="number" id="regAge" placeholder="Age">
+                <input type="number" step="0.1" id="regWeight" placeholder="Wt (kg)">
+                <input type="number" step="0.1" id="regHeight" placeholder="Ht (cm)">
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fa-solid fa-rocket"></i> Create Account
+            </button>
+        </form>
+        <!-- Trainer Portal Section -->
+        <div style="margin-top:24px;padding:20px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(6,182,212,0.1));border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius);text-align:center">
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
+                <i class="fa-solid fa-chalkboard-user" style="font-size:1.3rem;color:var(--neon-green)"></i>
+                <span style="font-family:var(--font-main);font-weight:700;font-size:1rem;color:var(--text-primary)">Are you a Trainer?</span>
+            </div>
+            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:14px">Manage clients, video coaching & grow your business</p>
+            <a href="./trainer.html" class="btn-primary" style="background:linear-gradient(135deg,var(--neon-green),#059669);text-decoration:none;display:inline-flex;padding:10px 28px;font-size:0.9rem">
+                <i class="fa-solid fa-arrow-right"></i> Open Trainer Portal
+            </a>
+        </div>
+    </div>
+</section>
 
-            <div class="dashboard-sections">
-                <!-- Overview Section -->
-                <div id="overview" class="content-section active">
-                    <div class="stats-grid">
-                        <div class="stat-card glass-panel">
-                            <i class="fa-solid fa-fire stat-icon color-orange"></i>
-                            <div class="stat-info">
-                                <h3>Workouts Done</h3>
-                                <p id="statWorkouts" class="stat-value">0</p>
-                            </div>
+<!-- ══════════════════════════════════════════ DASHBOARD VIEW ══ -->
+<section id="dashboardView" class="view hidden">
+
+    <!-- Sidebar -->
+    <nav class="sidebar glass-panel">
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <div class="brand-icon"><i class="fa-solid fa-dumbbell"></i></div>
+                <h2>FitTrack</h2>
+            </div>
+            <button id="mobileMenuBtn" class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></button>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-group-label">Main</li>
+            <li><a href="#" class="active" data-target="overview"><i class="fa-solid fa-house-chimney"></i><span>Overview</span></a></li>
+            <li><a href="#" data-target="workouts"><i class="fa-solid fa-calendar-check"></i><span>Workouts</span></a></li>
+            <li><a href="#" data-target="active-workout"><i class="fa-solid fa-bolt"></i><span>Live Workout</span></a></li>
+            <li class="nav-group-label">Analytics</li>
+            <li><a href="#" data-target="analytics"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></a></li>
+            <li><a href="#" data-target="progress"><i class="fa-solid fa-scale-balanced"></i><span>Body Log</span></a></li>
+            <li class="nav-group-label">Social</li>
+            <li><a href="#" data-target="trainers"><i class="fa-solid fa-users"></i><span>Trainers</span></a></li>
+            <li><a href="#" data-target="trainer-chat" id="navChat" class="hidden"><i class="fa-solid fa-comments"></i><span>Chat & Video</span></a></li>
+            <li class="nav-group-label">Account</li>
+            <li><a href="#" data-target="profile"><i class="fa-solid fa-user-gear"></i><span>Profile</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <span id="userNameDisplay">User</span>
+            </div>
+            <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <header class="topbar">
+            <h1 id="pageTitle">Overview</h1>
+            <div class="date-display" id="currentDate"><i class="fa-regular fa-calendar"></i></div>
+        </header>
+
+        <div class="dashboard-sections">
+
+            <!-- ── OVERVIEW ── -->
+            <div id="overview" class="content-section active">
+                <div class="stats-grid">
+                    <!-- XP Card full width -->
+                    <div class="glass-panel xp-card stat-card-full">
+                        <div class="xp-header">
+                            <div class="xp-level"><i class="fa-solid fa-star" style="color:var(--neon-yellow)"></i> Level <span id="userLevel">1</span></div>
+                            <div class="xp-amount" id="xpText">0 / 100 XP</div>
                         </div>
-                        <div class="stat-card glass-panel">
-                            <i class="fa-solid fa-weight-scale stat-icon color-blue"></i>
-                            <div class="stat-info">
-                                <h3>Current Weight</h3>
-                                <p id="statWeight" class="stat-value">-- kg</p>
-                            </div>
+                        <div class="xp-bar-track">
+                            <div class="xp-bar-fill" id="xpBar"></div>
                         </div>
-                        <div class="stat-card glass-panel">
-                            <i class="fa-solid fa-bullseye stat-icon text-gradient"></i>
-                            <div class="stat-info">
-                                <h3>Goal Weight</h3>
-                                <p id="statGoal" class="stat-value">-- kg</p>
-                            </div>
-                        </div>
+                        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap" id="badgesRow"></div>
                     </div>
-                    <div class="chart-container glass-panel" style="padding: 20px; margin-bottom: 30px; position: relative; height: 320px; width: 100%; display: flex; justify-content: center; align-items: center; text-align: center;">
-                        <p id="emptyChartMessage" style="color: var(--text-muted); font-size: 1.1rem; z-index: 10; display: none;">
-                            <i class="fa-solid fa-chart-line" style="display: block; font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
-                            No weight logged yet. Add progress below!
-                        </p>
-                        <canvas id="weightChart" style="position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px;"></canvas>
+
+                    <!-- Stat cards -->
+                    <div class="glass-panel stat-card">
+                        <div class="stat-card-glow" style="background:var(--neon-orange)"></div>
+                        <div class="stat-icon-wrap" style="background:rgba(249,115,22,0.12);color:var(--neon-orange)"><i class="fa-solid fa-fire"></i></div>
+                        <div class="stat-info"><h3>Workouts Done</h3><p id="statWorkouts" class="stat-value">0</p></div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <div class="stat-card-glow" style="background:var(--neon-cyan)"></div>
+                        <div class="stat-icon-wrap" style="background:rgba(6,182,212,0.12);color:var(--neon-cyan)"><i class="fa-solid fa-weight-scale"></i></div>
+                        <div class="stat-info"><h3>Current Weight</h3><p id="statWeight" class="stat-value">-- kg</p></div>
+                    </div>
+                    <div class="glass-panel stat-card">
+                        <div class="stat-card-glow" style="background:var(--neon-green)"></div>
+                        <div class="stat-icon-wrap" style="background:rgba(16,185,129,0.12);color:var(--neon-green)"><i class="fa-solid fa-bullseye"></i></div>
+                        <div class="stat-info"><h3>Goal Weight</h3><p id="statGoal" class="stat-value">-- kg</p></div>
                     </div>
                 </div>
 
-                <!-- Workouts Section -->
-                <div id="workouts" class="content-section">
-                    <div class="section-header">
-                        <h2>Schedule Workout</h2>
+                <!-- Weight Chart -->
+                <div class="glass-panel chart-container" style="height:300px">
+                    <h3><i class="fa-solid fa-chart-line" style="color:var(--neon-purple);margin-right:8px"></i>Weight Progress</h3>
+                    <div id="emptyChartMessage" style="display:none"><i class="fa-solid fa-chart-line"></i>No weight logged yet. Add progress in Body Log!</div>
+                    <canvas id="weightChart" style="position:absolute;inset:60px 20px 20px"></canvas>
+                </div>
+            </div>
+
+            <!-- ── WORKOUTS ── -->
+            <div id="workouts" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title-underline">Schedule Workout</h2>
+                    <button id="btnGenerateAI" class="btn-primary" style="background:linear-gradient(135deg,var(--neon-orange),var(--neon-pink))">
+                        <i class="fa-solid fa-robot"></i> AI Generate Plan
+                    </button>
+                </div>
+                <form id="workoutForm" class="glass-panel card-form">
+                    <div>
+                        <label class="form-label">Muscle Group</label>
+                        <select id="muscleFilter"><option value="">All Muscles</option></select>
                     </div>
-                    <form id="workoutForm" class="card-form glass-panel">
-                        <select id="muscleFilter">
-                            <option value="">All Muscles</option>
-                        </select>
-                        <select id="exerciseSelect" required>
-                            <option value="">Select Exercise</option>
-                        </select>
+                    <div>
+                        <label class="form-label">Exercise</label>
+                        <select id="exerciseSelect" required><option value="">Select Exercise</option></select>
+                    </div>
+                    <div>
+                        <label class="form-label">Date</label>
                         <input type="date" id="workoutDate" required>
-                        <input type="number" id="workoutSets" placeholder="Sets" required min="1">
-                        <input type="number" id="workoutReps" placeholder="Reps" required min="1">
-                        <button type="submit" class="btn-primary">Add Workout</button>
-                    </form>
-                    
-                    <div class="list-container">
-                        <h3>Upcoming & Recent Workouts</h3>
-                        <div id="workoutsList" class="list glass-panel">
-                            <!-- Populated dynamically -->
-                        </div>
                     </div>
-                </div>
-
-                <!-- Progress Section -->
-                <div id="progress" class="content-section">
-                    <div class="section-header">
-                        <h2>Log Progress</h2>
+                    <div>
+                        <label class="form-label">Sets</label>
+                        <input type="number" id="workoutSets" placeholder="e.g. 3" required min="1">
                     </div>
-                    <form id="progressForm" class="card-form glass-panel">
-                        <input type="date" id="progressDate" required>
-                        <input type="number" step="0.1" id="progressWeight" placeholder="Weight (kg)">
-                        <input type="number" id="progressCalories" placeholder="Calories Burned">
-                        <input type="text" id="progressNotes" placeholder="Notes (Optional)">
-                        <button type="submit" class="btn-primary">Log Entry</button>
-                    </form>
-                    
-                    <div class="list-container">
-                        <h3>Progress History</h3>
-                        <div id="progressList" class="list glass-panel">
-                            <!-- Populated dynamically -->
-                        </div>
+                    <div>
+                        <label class="form-label">Reps</label>
+                        <input type="number" id="workoutReps" placeholder="e.g. 12" required min="1">
                     </div>
-                </div>
-
-                <!-- Profile Section -->
-                <div id="profile" class="content-section">
-                    <div class="section-header">
-                        <h2>My Profile & Goals</h2>
-                    </div>
-                    <form id="profileForm" class="card-form glass-panel" style="display: flex; flex-direction: column; gap: 20px;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div class="input-group">
-                                <label style="display:block; margin-bottom: 5px; color: var(--text-muted);">Name</label>
-                                <input type="text" id="profileName" required style="width: 100%;">
-                            </div>
-                            <div class="input-group">
-                                <label style="display:block; margin-bottom: 5px; color: var(--text-muted);">Age</label>
-                                <input type="number" id="profileAge" style="width: 100%;">
-                            </div>
-                            <div class="input-group">
-                                <label style="display:block; margin-bottom: 5px; color: var(--text-muted);">Height (cm)</label>
-                                <input type="number" step="0.1" id="profileHeight" style="width: 100%;">
-                            </div>
-                        </div>
-                        
-                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                            <h3 style="margin-bottom: 15px;">Fitness Goals</h3>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                                <div class="input-group">
-                                    <label style="display:block; margin-bottom: 5px; color: var(--text-muted);">Starting/Current Base Weight (kg)</label>
-                                    <input type="number" step="0.1" id="profileWeight" style="width: 100%;">
-                                </div>
-                                <div class="input-group">
-                                    <label style="display:block; margin-bottom: 5px; color: var(--text-muted);">Target Goal Weight (kg)</label>
-                                    <input type="number" step="0.1" id="profileGoalWeight" style="width: 100%;">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                            <button type="submit" class="btn-primary" style="width: auto;">Save Profile <i class="fa-solid fa-save"></i></button>
-                        </div>
-                    </form>
+                    <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Add Workout</button>
+                </form>
+                <div>
+                    <h3 style="font-size:1rem;font-weight:600;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">Upcoming & Recent</h3>
+                    <div id="workoutsList" class="list glass-panel" style="padding:12px;max-height:400px"></div>
                 </div>
             </div>
-        </main>
-    </section>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./js/api.js"></script>
-    <script src="./js/auth.js"></script>
-    <script src="./js/dashboard.js"></script>
-    <script src="./js/app.js"></script>
+            <!-- ── LIVE WORKOUT ── -->
+            <div id="active-workout" class="content-section">
+                <!-- Pre-workout panel -->
+                <div id="preWorkoutPanel" class="glass-panel pre-workout-panel">
+                    <div class="big-icon"><i class="fa-solid fa-bolt" style="color:var(--neon-orange)"></i></div>
+                    <h2 style="font-size:2rem;margin-bottom:10px">Ready to crush it?</h2>
+                    <p style="color:var(--text-secondary);max-width:400px;margin:0 auto 28px">Start tracking your workout live. Rest timers, AI form analysis, and real-time rep counting.</p>
+                    <select id="liveWorkoutSelect" style="max-width:280px;margin:0 auto 24px;display:block"></select>
+                    <button id="btnStartLive" class="btn-success" style="font-size:1.1rem;padding:14px 40px">
+                        <i class="fa-solid fa-play"></i> START WORKOUT
+                    </button>
+                </div>
+
+                <!-- Active panel -->
+                <div id="activeWorkoutPanel" class="active-workout-panel hidden">
+                    <div class="aw-status-bar">
+                        <div class="aw-live-badge"><div class="aw-live-dot"></div>LIVE SESSION</div>
+                        <button id="btnEndWorkout" class="btn-danger"><i class="fa-solid fa-stop"></i> End Workout</button>
+                    </div>
+
+                    <h2 class="aw-exercise" id="awExerciseName">Select Exercise</h2>
+
+                    <!-- AI Camera -->
+                    <div style="margin:20px 0;text-align:center">
+                        <button id="btnToggleAI" class="btn-secondary" style="border-color:rgba(99,102,241,0.4);color:var(--neon-purple);margin-bottom:16px">
+                            <i class="fa-solid fa-eye"></i> Enable AI Form Tracker
+                        </button>
+                        <div id="aiTrackerContainer" class="ai-tracker-container hidden">
+                            <video id="trackerVideo" style="display:none;width:100%;height:auto" autoplay playsinline></video>
+                            <canvas id="trackerCanvas" style="width:100%;height:auto;display:block"></canvas>
+                            <div class="ai-tracker-badge"><div class="aw-live-dot"></div> AI Vision Active</div>
+                        </div>
+                    </div>
+
+                    <div class="aw-timer" id="awTimer">00:00</div>
+                    <p id="awTimerLabel">Rest Timer</p>
+
+                    <div class="aw-inputs">
+                        <div>
+                            <label class="form-label">Weight (kg)</label>
+                            <input type="number" id="awWeight" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="form-label">Reps</label>
+                            <input type="number" id="awReps" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="aw-controls">
+                        <button id="btnLogSet" class="btn-success" style="font-size:1.05rem;padding:14px 32px">
+                            <i class="fa-solid fa-check"></i> LOG SET & REST
+                        </button>
+                        <button id="btnSkipRest" class="btn-secondary"><i class="fa-solid fa-forward"></i> Skip Rest</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── ANALYTICS ── -->
+            <div id="analytics" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title-underline">Advanced Analytics</h2>
+                </div>
+                <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+                    <div class="glass-panel chart-container" style="height:320px">
+                        <h3>Volume / Tonnage Load (kg)</h3>
+                        <canvas id="volumeChart" style="position:absolute;top:60px;inset-inline:16px;bottom:16px"></canvas>
+                    </div>
+                    <div class="glass-panel chart-container" style="height:320px">
+                        <h3>Estimated 1RM Progression</h3>
+                        <canvas id="onermChart" style="position:absolute;top:60px;inset-inline:16px;bottom:16px"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── BODY LOG ── -->
+            <div id="progress" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title-underline">Log Progress</h2>
+                </div>
+                <form id="progressForm" class="glass-panel progress-form">
+                    <div>
+                        <label class="form-label">Date</label>
+                        <input type="date" id="progressDate" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Weight (kg)</label>
+                        <input type="number" step="0.1" id="progressWeight" placeholder="e.g. 78.5">
+                    </div>
+                    <div>
+                        <label class="form-label">Calories Burned</label>
+                        <input type="number" id="progressCalories" placeholder="e.g. 450">
+                    </div>
+                    <div>
+                        <label class="form-label">Notes</label>
+                        <input type="text" id="progressNotes" placeholder="How did you feel?">
+                    </div>
+                    <div style="display:flex;align-items:flex-end">
+                        <button type="submit" class="btn-primary" style="width:100%"><i class="fa-solid fa-plus"></i> Log Entry</button>
+                    </div>
+                </form>
+                <div>
+                    <h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:12px">History</h3>
+                    <div id="progressList" class="list glass-panel" style="padding:12px"></div>
+                </div>
+            </div>
+
+            <!-- ── TRAINERS ── -->
+            <div id="trainers" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title-underline">Hire a Professional Trainer</h2>
+                    <span class="badge badge-purple"><i class="fa-solid fa-shield-halved"></i> Verified Coaches</span>
+                </div>
+                <div class="glass-panel" style="padding:20px;margin-bottom:24px;display:flex;align-items:center;gap:16px;border-left:3px solid var(--neon-purple)">
+                    <i class="fa-solid fa-star" style="font-size:1.5rem;color:var(--neon-yellow)"></i>
+                    <p style="color:var(--text-secondary);font-size:0.92rem">Subscribe to a certified trainer and unlock personalised workout plans, 1-on-1 video coaching, and direct messaging.</p>
+                </div>
+                <div id="trainersList" class="trainers-grid"></div>
+            </div>
+
+            <!-- ── CHAT & VIDEO ── -->
+            <div id="trainer-chat" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title-underline">1-on-1 Coaching</h2>
+                    <button id="btnStartVideoCall" class="btn-primary" style="background:linear-gradient(135deg,var(--neon-cyan),var(--neon-green))">
+                        <i class="fa-solid fa-video"></i> Start Video Call
+                    </button>
+                </div>
+
+                <!-- Chat -->
+                <div id="chatInterface" class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-trainer-avatar" id="chatTrainerImgWrap"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.95rem" id="chatTrainerName">Your Trainer</div>
+                            <div class="chat-online">Online</div>
+                        </div>
+                    </div>
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <form id="chatForm" class="chat-input-row">
+                        <input type="text" id="chatInput" placeholder="Type a message..." required>
+                        <button type="submit" class="btn-primary" style="width:44px;height:44px;border-radius:50%;padding:0"><i class="fa-solid fa-paper-plane"></i></button>
+                    </form>
+                </div>
+
+                <!-- Video Call -->
+                <div id="videoCallInterface" class="video-call-container hidden" style="margin-top:20px">
+                    <video id="remoteVideo" class="video-remote" autoplay playsinline style="width:100%;height:100%;object-fit:cover;background:#000"></video>
+                    <div class="video-local" style="overflow:hidden">
+                        <video id="localVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
+                    </div>
+                    <div class="video-rec-badge">
+                        <div class="aw-live-dot"></div> Live Session <span id="videoTimer">00:00</span>
+                    </div>
+                    <div class="video-controls">
+                        <button id="btnMic" class="video-control-btn"><i class="fa-solid fa-microphone"></i></button>
+                        <button id="btnEndCall" class="video-control-btn end"><i class="fa-solid fa-phone-slash"></i></button>
+                        <button id="btnCam" class="video-control-btn"><i class="fa-solid fa-video"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── PROFILE ── -->
+            <div id="profile" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title-underline">My Profile & Goals</h2>
+                </div>
+                <form id="profileForm" class="glass-panel" style="padding:28px;margin-bottom:24px">
+                    <div class="profile-avatar-section">
+                        <img id="profileImagePreview" src="" alt="Profile">
+                        <div>
+                            <label for="profileImageInput" class="btn-secondary" style="display:inline-flex;cursor:pointer;padding:8px 16px;font-size:0.85rem">
+                                <i class="fa-solid fa-camera"></i> Change Photo
+                            </label>
+                            <input type="file" id="profileImageInput" accept="image/*" class="hidden">
+                            <p style="color:var(--text-muted);font-size:0.78rem;margin-top:6px">JPG, PNG — max 5MB</p>
+                        </div>
+                    </div>
+                    <div class="profile-grid" style="gap:16px">
+                        <div>
+                            <label class="form-label">Name</label>
+                            <input type="text" id="profileName" required>
+                        </div>
+                        <div>
+                            <label class="form-label">Age</label>
+                            <input type="number" id="profileAge">
+                        </div>
+                        <div>
+                            <label class="form-label">Height (cm)</label>
+                            <input type="number" step="0.1" id="profileHeight">
+                        </div>
+                        <div>
+                            <label class="form-label">Current Weight (kg)</label>
+                            <input type="number" step="0.1" id="profileWeight">
+                        </div>
+                        <div>
+                            <label class="form-label">Goal Weight (kg)</label>
+                            <input type="number" step="0.1" id="profileGoalWeight">
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;margin-top:20px">
+                        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+                    </div>
+                </form>
+
+                <div>
+                    <h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:16px"><i class="fa-solid fa-medal" style="color:var(--neon-yellow);margin-right:6px"></i>Achievements & Badges</h3>
+                    <div id="badgesContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px"></div>
+                </div>
+            </div>
+
+        </div><!-- /dashboard-sections -->
+    </main>
+</section>
+
+<!-- ── AI FITBOT WIDGET ── -->
+<div id="aiWidget">
+    <button id="aiToggleBtn" title="FitBot AI"><i class="fa-solid fa-robot"></i></button>
+    <div id="aiChatPanel" class="hidden">
+        <div class="ai-panel-header">
+            <i class="fa-solid fa-robot"></i>
+            <span>FitBot AI</span>
+            <small><i class="fa-solid fa-circle"></i> Online</small>
+        </div>
+        <div id="aiMessages">
+            <div class="ai-msg bot">Hey! 👋 I'm FitBot, your AI coach. Ask me anything about workouts, nutrition, or your progress!</div>
+        </div>
+        <form id="aiForm" class="ai-input-row">
+            <input type="text" id="aiInput" placeholder="Ask me anything...">
+            <button type="button" id="btnVoiceCommand" class="btn-secondary" style="border-radius:50%;width:40px;height:40px;padding:0"><i class="fa-solid fa-microphone"></i></button>
+            <button id="btnSendAI" type="submit" class="btn-primary" style="border-radius:50%;width:40px;height:40px;padding:0"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+    </div>
+</div>
+
+<!-- Overlay for mobile sidebar -->
+<div id="sidebarOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:199;backdrop-filter:blur(4px)"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js" defer></script>
+<script src="./js/api.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/dashboard.js"></script>
+<script src="./js/ai-tracker.js"></script>
+<script src="./js/videocall.js"></script>
+<script src="./js/app.js"></script>
+
+<!-- TensorFlow loaded async — only needed for AI Form Tracker, not page init -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection" defer></script>
+
 </body>
 </html>

@@ -3,14 +3,52 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkAuth() {
-    const token = localStorage.getItem('token');
+    let token = localStorage.getItem('token');
+    
+    // Safety check: if token is the string "undefined" or "null", treat as null
+    if (token === 'undefined' || token === 'null' || token === '') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        token = null;
+    }
+
+    // Validate token is a real JWT (has 3 dot-separated parts) and not expired
+    if (token) {
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) throw new Error('bad token');
+            const payload = JSON.parse(atob(parts[1]));
+            // Check expiry if present
+            if (payload.exp && payload.exp * 1000 < Date.now()) {
+                throw new Error('token expired');
+            }
+        } catch (e) {
+            console.warn('Invalid/expired token, clearing:', e.message);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            token = null;
+        }
+    }
+
     const authView = document.getElementById('authView');
     const dashboardView = document.getElementById('dashboardView');
+    const loader = document.getElementById('loader');
+
+    // Always hide loader first
+    if (loader) {
+        loader.classList.add('hidden');
+        loader.style.display = 'none';
+    }
 
     if (token) {
         authView.classList.add('hidden');
         dashboardView.classList.remove('hidden');
-        initDashboard();
+        try {
+            initDashboard();
+        } catch (e) {
+            console.error('Dashboard error:', e);
+            hideLoader();
+        }
     } else {
         dashboardView.classList.add('hidden');
         authView.classList.remove('hidden');
@@ -19,11 +57,19 @@ function checkAuth() {
 
 // Global UI helpers
 function showLoader() {
-    document.getElementById('loader').classList.remove('hidden');
+    const loader = document.getElementById('loader');
+    if (loader) {
+        loader.style.display = '';
+        loader.classList.remove('hidden');
+    }
 }
 
 function hideLoader() {
-    document.getElementById('loader').classList.add('hidden');
+    const loader = document.getElementById('loader');
+    if (loader) {
+        loader.classList.add('hidden');
+        loader.style.display = 'none';
+    }
 }
 
 function showToast(message, type = 'success') {
